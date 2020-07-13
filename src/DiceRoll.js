@@ -55,15 +55,17 @@ class DiceRoll {
   /**
    * Parses the notation and rolls the dice
    *
-   * @param notation
+   * @param {string} notation
+   * @param {{}=} options
    */
-  constructor(notation) {
+  constructor(notation, options = {}) {
     if (!notation) {
       throw new RequiredArgumentError('notation');
     }
 
     // initialise the parsed dice array
     this[parsedNotationSymbol] = [];
+    this.options = {};
 
     if ((notation instanceof Object) && !Array.isArray(notation)) {
       // validate object
@@ -85,10 +87,12 @@ class DiceRoll {
               if (roll instanceof RollResults) {
                 // already a RollResults object
                 return roll;
-              } if (Array.isArray(roll)) {
+              }
+              if (Array.isArray(roll)) {
                 // array of values
                 return new RollResults(roll);
-              } if ((roll instanceof Object) && Array.isArray(roll.rolls)) {
+              }
+              if ((roll instanceof Object) && Array.isArray(roll.rolls)) {
                 // object with list of rolls
                 return new RollResults(roll.rolls);
               }
@@ -97,6 +101,13 @@ class DiceRoll {
             })
             .filter(Boolean);
         }
+      }
+
+      // define the options
+      if ((typeof notation.options === 'object') && !Array.isArray(notation.options)) {
+        this.options = Object.assign(this.options, notation.options);
+      } else if (notation.options) {
+        throw new TypeError('notation.options must be an object');
       }
 
       // store the notation
@@ -126,6 +137,13 @@ class DiceRoll {
       this.roll();
     } else {
       throw new NotationError(notation);
+    }
+
+    // define the options
+    if ((typeof options === 'object') && !Array.isArray(options)) {
+      this.options = Object.assign(this.options, options);
+    } else if (options) {
+      throw new TypeError('options must be an object');
     }
   }
 

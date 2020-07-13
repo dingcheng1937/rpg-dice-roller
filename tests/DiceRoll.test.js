@@ -22,6 +22,7 @@ describe('DiceRoll', () => {
         total: expect.any(Number),
         export: expect.any(Function),
         hasRolls: expect.any(Function),
+        options: expect.any(Object),
         roll: expect.any(Function),
         toJSON: expect.any(Function),
         toString: expect.any(Function),
@@ -557,8 +558,9 @@ describe('DiceRoll', () => {
   });
 
   describe('Export', () => {
-    let notation; let diceRoll; let
-      rolls;
+    let notation;
+    let diceRoll;
+    let rolls;
 
     beforeEach(() => {
       notation = '4d8+6d10';
@@ -572,7 +574,10 @@ describe('DiceRoll', () => {
         ]),
       ];
 
-      diceRoll = new DiceRoll(notation, rolls);
+      diceRoll = new DiceRoll({
+        notation,
+        rolls,
+      });
     });
 
     test('can export to valid JSON', () => {
@@ -680,5 +685,131 @@ describe('DiceRoll', () => {
         DiceRoll.import(1);
       }).toThrow(DataFormatError);
     });
+  });
+
+  describe('options', () => {
+    const options = {
+      foo: 'bar',
+      bar: true,
+      baz: {
+        item1: 1,
+        item2: 2,
+        item3: 3,
+      },
+      biz: [4, 5, 6],
+    };
+
+    test('defaults to empty object if not defined', () => {
+      const roller = new DiceRoll('d6');
+      expect(roller.options).toEqual({});
+    });
+
+    describe('valid', () => {
+      test('can be set as a `options` property of the `notations` parameter', () => {
+        const roller = new DiceRoll({ notation: 'd6', options });
+
+        expect(roller.options).toEqual(options);
+      });
+
+      test('can be set in the `options` parameter', () => {
+        const roller = new DiceRoll('d6', options);
+
+        expect(roller.options).toEqual(options);
+      });
+
+      test('falsey values return empty object', () => {
+        let roller = new DiceRoll({ notation: 'd6', options: false });
+        expect(roller.options).toEqual({});
+
+        roller = new DiceRoll({ notation: 'd6', options: null });
+        expect(roller.options).toEqual({});
+
+        roller = new DiceRoll({ notation: 'd6', options: undefined });
+        expect(roller.options).toEqual({});
+
+        roller = new DiceRoll({ notation: 'd6', options: 0 });
+        expect(roller.options).toEqual({});
+
+        roller = new DiceRoll('d6', false);
+        expect(roller.options).toEqual({});
+
+        roller = new DiceRoll('d6', null);
+        expect(roller.options).toEqual({});
+
+        roller = new DiceRoll('d6', undefined);
+        expect(roller.options).toEqual({});
+
+        roller = new DiceRoll('d6', 0);
+        expect(roller.options).toEqual({});
+      });
+
+      test('setting in parameter and the `data` property gets merged', () => {
+        const roller = new DiceRoll(
+          {
+            notation: 'd6',
+            options: {
+              foo: 'bar',
+              baz: {
+                item1: 1,
+              },
+            },
+          },
+          {
+            bar: true,
+            baz: {
+              item2: 2,
+            },
+          },
+        );
+
+        expect(roller.options).toEqual({
+          foo: 'bar',
+          bar: true,
+          baz: {
+            item2: 2,
+          },
+        });
+      });
+    });
+
+    describe('invalid', () => {
+      test('throws error if `notations.options` is not object', () => {
+        expect(() => {
+          new DiceRoll({ notation: 'd6', options: true });
+        }).toThrow(TypeError);
+
+        expect(() => {
+          new DiceRoll({ notation: 'd6', options: 1 });
+        }).toThrow(TypeError);
+
+        expect(() => {
+          new DiceRoll({ notation: 'd6', options: 456 });
+        }).toThrow(TypeError);
+
+        expect(() => {
+          new DiceRoll({ notation: 'd6', options: [] });
+        }).toThrow(TypeError);
+      });
+
+      test('throws error if `options` parameter is not object', () => {
+        expect(() => {
+          new DiceRoll('d6', true);
+        }).toThrow(TypeError);
+
+        expect(() => {
+          new DiceRoll('d6', 1);
+        }).toThrow(TypeError);
+
+        expect(() => {
+          new DiceRoll('d6', 456);
+        }).toThrow(TypeError);
+
+        expect(() => {
+          new DiceRoll('d6', []);
+        }).toThrow(TypeError);
+      });
+    });
+
+    // @todo assert that options are used
   });
 });

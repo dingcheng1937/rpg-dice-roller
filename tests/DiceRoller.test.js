@@ -22,6 +22,7 @@ describe('DiceRoller', () => {
         clearLog: expect.any(Function),
         export: expect.any(Function),
         import: expect.any(Function),
+        options: expect.any(Object),
         toJSON: expect.any(Function),
         toString: expect.any(Function),
         roll: expect.any(Function),
@@ -314,8 +315,8 @@ describe('DiceRoller', () => {
     });
 
     describe('protoype', () => {
-      let importRoller; let
-        notations;
+      let importRoller;
+      let notations;
 
       beforeEach(() => {
         notations = [
@@ -375,5 +376,137 @@ describe('DiceRoller', () => {
         }).toThrow(DataFormatError);
       });
     });
+  });
+
+  describe('options', () => {
+    const options = {
+      foo: 'bar',
+      bar: true,
+      baz: {
+        item1: 1,
+        item2: 2,
+        item3: 3,
+      },
+      biz: [4, 5, 6],
+    };
+
+    test('defaults to empty object if not defined', () => {
+      expect(roller.options).toEqual({});
+    });
+
+    describe('valid', () => {
+      test('can be set as a `options` property of the `data` parameter', () => {
+        roller = new DiceRoller({ options });
+
+        expect(roller.options).toEqual(options);
+      });
+
+      test('can be set in the `options` parameter', () => {
+        roller = new DiceRoller(null, options);
+
+        expect(roller.options).toEqual(options);
+      });
+
+      test('falsey values return empty object', () => {
+        roller = new DiceRoller({ options: false });
+        expect(roller.options).toEqual({});
+
+        roller = new DiceRoller({ options: null });
+        expect(roller.options).toEqual({});
+
+        roller = new DiceRoller({ options: undefined });
+        expect(roller.options).toEqual({});
+
+        roller = new DiceRoller({ options: 0 });
+        expect(roller.options).toEqual({});
+
+        roller = new DiceRoller(null, false);
+        expect(roller.options).toEqual({});
+
+        roller = new DiceRoller(null, null);
+        expect(roller.options).toEqual({});
+
+        roller = new DiceRoller(null, undefined);
+        expect(roller.options).toEqual({});
+
+        roller = new DiceRoller(null, 0);
+        expect(roller.options).toEqual({});
+      });
+
+      test('setting in parameter and the `data` property gets merged', () => {
+        roller = new DiceRoller(
+          {
+            options: {
+              foo: 'bar',
+              baz: {
+                item1: 1,
+              },
+            },
+          },
+          {
+            bar: true,
+            baz: {
+              item2: 2,
+            },
+          },
+        );
+
+        expect(roller.options).toEqual({
+          foo: 'bar',
+          bar: true,
+          baz: {
+            item2: 2,
+          },
+        });
+      });
+    });
+
+    describe('invalid', () => {
+      test('throws error if `data.options` is not an object', () => {
+        expect(() => {
+          new DiceRoller({ options: true });
+        }).toThrow(TypeError);
+
+        expect(() => {
+          new DiceRoller({ options: 1 });
+        }).toThrow(TypeError);
+
+        expect(() => {
+          new DiceRoller({ options: 456 });
+        }).toThrow(TypeError);
+
+        expect(() => {
+          new DiceRoller({ options: [] });
+        }).toThrow(TypeError);
+      });
+
+      test('throws error if `options` parameter is not object', () => {
+        expect(() => {
+          new DiceRoller(null, true);
+        }).toThrow(TypeError);
+
+        expect(() => {
+          new DiceRoller(null, 1);
+        }).toThrow(TypeError);
+
+        expect(() => {
+          new DiceRoller(null, 456);
+        }).toThrow(TypeError);
+
+        expect(() => {
+          new DiceRoller(null, []);
+        }).toThrow(TypeError);
+      });
+    });
+
+    describe('passes options to `DiceRoll` instance', () => {
+      roller = new DiceRoller(null, options);
+
+      const roll = roller.roll('d6');
+
+      expect(roll.options).toEqual(options);
+    });
+
+    // @todo assert that you can change options after setting
   });
 });

@@ -21,10 +21,12 @@ class DiceRoller {
    * Initialises the object
    *
    * @constructor
-   * @param data
+   * @param {{}|null=} data
+   * @param {{}=} options
    */
-  constructor(data) {
+  constructor(data, options = {}) {
     this[logSymbol] = [];
+    this.options = {};
 
     if (data) {
       if (Array.isArray(data.log)) {
@@ -35,6 +37,20 @@ class DiceRoller {
       } else if (data.log) {
         throw new TypeError('data.log must be an Array');
       }
+
+      // define the options
+      if ((typeof data.options === 'object') && !Array.isArray(data.options)) {
+        this.options = Object.assign(this.options, data.options);
+      } else if (data.options) {
+        throw new TypeError('data.options must be an object');
+      }
+    }
+
+    // define the options
+    if ((typeof options === 'object') && !Array.isArray(options)) {
+      this.options = Object.assign(this.options, options);
+    } else if (options) {
+      throw new TypeError('options must be an object');
     }
   }
 
@@ -198,7 +214,7 @@ class DiceRoller {
    * object will be returned, if multiple are provided then
    * it will return an array of DiceRoll objects.
    *
-   * @param {string[]} notations
+   * @param {string|string[]} notations
    *
    * @returns {DiceRoll|DiceRoll[]}
    */
@@ -210,7 +226,7 @@ class DiceRoller {
     }
 
     const rolls = filteredNotations.map((notation) => {
-      const diceRoll = new DiceRoll(notation);
+      const diceRoll = new DiceRoll(notation, this.options);
 
       // add the roll log to our global log
       this[logSymbol].push(diceRoll);
