@@ -5,8 +5,10 @@ import { diceUtils, exportFormats } from './utilities/utils';
 import * as Dice from './Dice';
 import * as Modifiers from './Modifiers';
 import * as NumberGenerator from './utilities/NumberGenerator';
+import { config } from './utilities/config';
 
 export {
+  config,
   diceUtils,
   exportFormats,
   Dice,
