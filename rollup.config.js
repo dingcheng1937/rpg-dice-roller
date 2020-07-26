@@ -57,11 +57,12 @@ export default [
       name: packageName,
       // map external dependencies to variables
       globals: {
+        mathjs: 'math',
         'random-js': 'Random',
       },
     },
     plugins: plugins(true, production),
     // indicate which modules should be treated as external
-    external: ['random-js'],
+    external: ['mathjs', 'random-js'],
   },
 ];
