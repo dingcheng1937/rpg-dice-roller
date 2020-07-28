@@ -55,7 +55,13 @@ export default [
       file: outputPath('umd', production),
       format: 'umd',
       name: packageName,
+      // map external dependencies to variables
+      globals: {
+        'random-js': 'Random',
+      },
     },
     plugins: plugins(true, production),
+    // indicate which modules should be treated as external
+    external: ['random-js'],
   },
 ];
