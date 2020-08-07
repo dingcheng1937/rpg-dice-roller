@@ -58,11 +58,12 @@ export default [
       // map external dependencies to variables
       globals: {
         mathjs: 'math',
+        'mathjs-expression-parser': 'math',
         'random-js': 'Random',
       },
     },
     plugins: plugins(true, production),
     // indicate which modules should be treated as external
-    external: ['mathjs', 'random-js'],
+    external: ['mathjs', 'mathjs-expression-parser', 'random-js'],
   },
 ];

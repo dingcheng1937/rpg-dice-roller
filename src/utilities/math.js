@@ -1,4 +1,4 @@
-import { evaluate as mathEval } from 'mathjs';
+import math from 'mathjs-expression-parser';
 
 /**
  * Check if `a` is comparative to `b` with the given operator.
@@ -57,7 +57,7 @@ const compareNumbers = (a, b, operator) => {
  *
  * @returns {number} The result of the equation
  */
-const evaluate = (equation) => mathEval(equation);
+const evaluate = (equation) => math.eval(equation);
 
 /**
  * Check if the given value is a valid finite number.
