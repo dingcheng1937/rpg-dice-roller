@@ -1,5 +1,6 @@
 import { RequiredArgumentError } from './exceptions/index.js';
 import { Modifier } from './modifiers/index.js';
+import { StandardDice } from './dice/index.js';
 
 const modifiersSymbol = Symbol('modifiers');
 const expressionsSymbol = Symbol('expressions');
@@ -126,6 +127,24 @@ class RollGroup {
     }
 
     return notation;
+  }
+
+  roll() {
+    const rollResults = this.expressions.map((expression) => {
+      if (expression instanceof StandardDice) {
+        // roll the object and return the value
+        return expression.roll();
+      }
+
+      return null;
+    }).filter(Boolean);
+
+    // loop through each modifier and carry out its actions
+    (this.modifiers || []).forEach((modifier) => {
+      modifier.run(rollResults, this);
+    });
+
+    return rollResults;
   }
 
   /**
